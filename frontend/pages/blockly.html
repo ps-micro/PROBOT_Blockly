@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="http://127.0.0.1:1036/pages/assets/Logo-head.jpg" rel="shortcut icon" type="image/x-icon">
+
+    <title>PROBOT Blockly</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="./button.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Include Blocky -->
+    <script src="../blockly/blockly_compressed.js"></script>
+    <script src="../blockly/blocks_compressed.js"></script>
+    <script src="../blockly/javascript_compressed.js"></script>
+    <script src="../blockly/python_compressed.js"></script>
+    <script src="../blockly/php_compressed.js"></script>
+    <script src="../blockly/msg/js/en.js"></script>
+    <script src="../blockly/blocks/code.js"></script>
+    <script src="../blockly/generators/python/code.js"></script>
+    <script src="../blockly/blocks/lists.js"></script>
+    <script src="../blockly/generators/python/lists.js"></script>
+    <script src="../blockly/blocks/logic.js"></script>
+    <script src="../blockly/generators/python/logic.js"></script>
+    <script src="../blockly/blocks/loops.js"></script>
+    <script src="../blockly/generators/python/loops.js"></script>
+    <script src="../blockly/blocks/math.js"></script>
+    <script src="../blockly/generators/python/math.js"></script>
+    <script src="../blockly/blocks/variables.js"></script>
+    <script src="../blockly/generators/python/variables.js"></script>
+    <script src="../blockly/blocks/probot_blocks.js"></script>
+    <script src="../blockly/generators/python/probot_blocks_gen.js"></script>
+
+
+
+    <!-- Ace editor -->
+    <script src="../ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- Ubuntu fonts -->
+    <!-- <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin"> -->
+    <link rel="stylesheet" type="text/css" href="assets/css/ubuntu.css">
+    <style>body { font-family: Ubuntu, sans-serif; }</style>
+
+
+</head>
+
+<body onload="restorelocal()">
+     <div id="wrapper">
+	  <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>	
+                </button>
+                <a class="navbar-brand" href="../index.html">PROBOT Blockly</a>
+		            <a id="launch_button" name="launch_button" href="#" onclick="ExecutionLogicModule.launch_code($('input[name=group_py]:checked').val());" class="btn blue mini">运行程序</a>	
+                <a id="end_button" name="end_button" href="#" onclick='ExecutionLogicModule.end_execution();' style="display:none;" class="btn blue mini">结束程序</a>
+	              <a id="refresh_button" name="refresh_button" href="blockly.html" style="display:none;" class="btn blue mini">刷新界面</a>
+  		          <a id="load_from_file_button" name="load_from_file_button" href="#" onclick='ExecutionLogicModule.load_from_file();' class="btn blue mini">导入程序</a>
+                <a id="save_to_file_button" name="save_to_file_button" href="#" onclick='ExecutionLogicModule.save_to_file();' class="btn blue mini">导出程序</a>
+                <a id="clean_ws_button" name="clean_ws_button" href="#" onclick='ExecutionLogicModule.clean_ws();' class="btn blue mini">清空界面</a>
+                <a id="pythondiv" style="color:#75A8D3; text-align:center" >
+                	<!-- <span>版本:</span> -->
+                  Python2<input id="python2" type="radio" value="2" name="group_py" checked />
+      			      Python3<input id="python3" type="radio" value="3" name="group_py" disabled />
+                </a>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+          <div class="">
+              <ul class="nav nav-tabs">
+                  <li class="active"><a href="#home" data-toggle="tab" onclick="show_blockly();">Block</a>
+                  </li>
+                  <li><a href="#profile" data-toggle="tab" onclick="hide_blockly();">Python</a>
+                  </li>
+              </ul>
+
+              <div class="tab-content">
+                  <div class="tab-pane fade in active" id="home">
+                    <div id="blocklyArea" style="height:100vh;"></div>
+                  </div>
+                  <div class="tab-pane fade" id="profile">
+                      <div id="editor" style="width:100%; height:100vh;">
+
+                        function foo(items) {
+                          var x = "All this is syntax highlighted";
+                          return x;
+                      }
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+    </div>
+
+    <div id="blocklyDiv" style="position: absolute"></div>
+    <xml id="toolbox" style="display: none">
+    <category id="catLogic" name="逻辑模块">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <!-- <block type="logic_ternary"></block> -->
+    </category>
+    <category id="catLoops" name="循环模块">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="for_time"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category id="catMath" name="数学模块">
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_change">
+        <value name="DELTA">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <category id="catLists" name="列表模块">
+      <block type="lists_create_with">
+        <mutation items="0"></mutation>
+      </block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <block type="math_number">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" class="listVar">...</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" class="listVar">...</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR" class="listVar">...</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR" class="listVar">...</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_split">
+        <value name="DELIM">
+          <block type="text">
+            <field name="TEXT">,</field>
+          </block>
+        </value>
+      </block>
+    </category>
+    <category id="catVariables" custom="VARIABLE" name="变量模块"></category>
+    <category id="catFunctions" custom="PROCEDURE" name="函数模块"></category>
+    <category id="code" name="Python模块">
+          <block type="run_code"></block>
+    </category>
+    <sep></sep>
+    <category id="arm_set" name="机械臂设置" colour="50">
+          <block type="arm_init"></block>
+          <block type="set_max_velocity_scaling_factor"></block>
+          <block type="set_max_acceleration_scaling_factor"></block>
+          <block type="set_goal_joint_tolerance"></block>
+          <block type="set_allow_replanning"></block>
+          <block type="set_goal_orientation_tolerance"></block>
+          <block type="set_goal_position_tolerance"></block>
+          <block type="arm_deinit"></block>
+    </category>
+    <category id="arm_move" name="机械臂运动" colour="50">
+          <block type="jog_joint"></block>
+          <block type="jog_pose_rpy"></block>
+          <block type="jog_pose"></block>
+          <block type="move_in_line"></block>
+          <block type="move_in_circle"></block>
+          <block type="go_home"></block>
+          <block type="sleep_s"></block>
+    </category>
+    <category id="controller" name="IO和末端工具" colour="50">
+          <block type="set_digital_output"></block>
+          <block type="if_digital_input"></block>
+          <block type="get_digital_input"></block>
+          <block type="digital_level"></block>
+    </category>
+    </xml>
+
+
+    <!-- jQuery -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+    <!-- Code execution logic -->
+    <script src="./js/execution_logic.js"></script>
+
+<!-- ACE editor configuration -->
+<script type="text/javascript">
+  document.getElementById('editor').style.fontSize='16px';
+</script>
+
+<script>
+  var blocklyArea = document.getElementById('blocklyArea');
+  var blocklyDiv = document.getElementById('blocklyDiv');
+  var workspace = Blockly.inject(blocklyDiv,
+    {toolbox: document.getElementById('toolbox'),
+       scrollbars: true,
+       rtl: false,
+       zoom:
+           {enabled: true,
+            controls: true,
+            wheel: true,
+            maxScale: 4,
+            minScale: .25,
+            scaleSpeed: 1.1
+           },
+       grid:
+           {spacing: 25,
+            length: 3,
+            colour: '#ccc',
+            snap: false},
+       trashcan: true});
+
+  var onresize = function(e) {
+  // Compute the absolute coordinates and dimensions of blocklyArea.
+  var element = blocklyArea;
+  var x = 0;
+  var y = 0;
+  do {
+    x += element.offsetLeft;
+    y += element.offsetTop;
+    element = element.offsetParent;
+  } while (element);
+  // Position blocklyDiv over blocklyArea.
+  blocklyDiv.style.left = x + 'px';
+  blocklyDiv.style.top = y + 'px';
+  blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+  blocklyDiv.style.height = blocklyArea.offsetHeight  + 'px';
+  // blocklyDiv.style.height = blocklyArea.offsetHeight - 51 - 42 + 171 + 'px';
+  };
+  window.addEventListener('resize', onresize, false);
+  onresize();
+</script>
+
+<script>
+  function tojavascript(){
+      Blockly.JavaScript.addReservedWords('code');
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      try {
+        //eval(code);
+        alert(code);
+      } catch (e) {
+        alert(e);
+      }
+  };
+
+  function tophp(){
+      Blockly.JavaScript.addReservedWords('code');
+      var code = Blockly.PHP.workspaceToCode(workspace);
+      try {
+        //eval(code);
+        alert(code);
+      } catch (e) {
+        alert(e);
+      }
+  };
+
+  function topython(){
+      Blockly.Python.addReservedWords('code');
+      var code = Blockly.Python.workspaceToCode(workspace);
+      try {
+        //eval(code);
+        alert(code);
+      } catch (e) {
+        alert(e);
+      }
+  };
+
+  // hide blockly and show the code
+  function hide_blockly() {
+      document.getElementById("blocklyDiv").style.display = 'none';
+      document.getElementById("blocklyArea").style.display = 'none';
+      // onresize();
+      window.dispatchEvent(new Event('resize'));
+
+      // show the code
+      Blockly.Python.addReservedWords('code');
+      var code = Blockly.Python.workspaceToCode(workspace);
+      // // the old way of placing the code, this required a textarea
+      // document.getElementById("editor").innerHTML = code;
+
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/python");
+      editor.getSession().setUseWrapMode(true);
+      editor.setShowPrintMargin(false);
+      editor.setValue(code);
+  };
+
+  function show_blockly() {
+      document.getElementById("blocklyDiv").style.display = 'block';
+      document.getElementById("blocklyArea").style.display = 'block';
+      window.location.reload(true);
+      // alert("resizing");
+      // window.dispatchEvent(new Event('resize'));
+  };
+</script>
+
+<script type="text/javascript">
+
+  // restore at the beginning.
+  // This is launched after the page has finished loading
+  function restorelocal(){
+    var xml_text = localStorage.getItem("blocks_cache");
+    try {
+      var xml = Blockly.Xml.textToDom(xml_text);
+      Blockly.Xml.domToWorkspace(workspace, xml);
+
+      automate_localstorage();
+    }
+    catch(err) {
+        // alert(err);
+        console.log(err);
+        // console.log("This is generally because there's no tree information");
+        automate_localstorage();
+    }
+
+    // Launch websockets
+    ExecutionLogicModule.launch_websockets();
+
+    // Recursively store everything after x miliseconds
+    // automate_localstorage();
+  }
+
+  function automate_localstorage(){
+      localstorage();
+      setTimeout(automate_localstorage, 1000);
+  }
+
+  // Save stuff on local storage
+  function localstorage() {
+    var xml = Blockly.Xml.workspaceToDom(workspace);
+    var xml_text = Blockly.Xml.domToText(xml);
+    localStorage.setItem("blocks_cache", xml_text);
+    // console.log("Saved: "+xml_text);
+    // console.log("-------------");
+    var xml_text_stored = localStorage.getItem("blocks_cache");
+    // console.log("Rtved: "+xml_text_stored)
+    // alert("Saved: "+xml_text);
+  }
+
+</script>
+
+</body>
+
+</html>
